@@ -1,19 +1,23 @@
-import { Component } from '@angular/core';
-import { post } from 'selenium-webdriver/http';
+import { Component } from "@angular/core";
+import { NgForm } from "@angular/forms";
 
+import { PostService } from '../post.service'
 @Component({
-    selector: 'app-post-create',
-    templateUrl: './post-create.component.html',
-    styleUrls: ['./post-create.component.css']
+  selector: "app-post-create",
+  templateUrl: "./post-create.component.html",
+  styleUrls: ["./post-create.component.css"]
 })
 export class PostCreateComponent {
-  
-    enteredValue = '' 
-   newPost = 'No Content'; 
-   
-   onAddPost() {
-    
-    this.newPost = this.enteredValue;
+  enteredTitle = "";
+  enteredContent = "";
 
+  constructor(public postsService: PostService) {}
+
+  onAddPost(form: NgForm) {
+    if (form.invalid) {
+      return;
+    }
+    this.postsService.addPost(form.value.title, form.value.content);
+    form.resetForm();
   }
 }
