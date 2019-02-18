@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject } from 'rxjs'; //is a event emitter
 import { HttpClient } from '@angular/common/http';
 
 import { Post } from './post.modal';
@@ -8,7 +8,7 @@ import { Post } from './post.modal';
 export class PostService {
     // private as you can't edit it form outside
     private posts: Post[] = [];
-    private postsUpdated = new Subject<Post[]>();
+    private postsUpdated = new Subject<Post[]>(); // Passinf list of post as payload 
 
     constructor(private http: HttpClient) {}
 
