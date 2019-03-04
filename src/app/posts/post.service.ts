@@ -46,12 +46,19 @@ export class PostService {
         return this.http.get<{_id: string, title: string, content: string}>("http://localhost:3000/api/posts/" + id);
     }
 
-    addPost(title: string, content: string) {   // POST data request
-        const post: Post = { id: null, title: title, content: content};
-        this.http.post<{message: string, postId: string}>('http://localhost:3000/api/posts', post)
+    addPost(title: string, content: string, image: File) {   // POST data request
+        // const post: Post = { id: null, title: title, content: content};
+        const postData = new FormData(); // FormData allow us to pass both text value and file.
+        postData.append("title", title);
+        console.log(image)
+        postData.append("content", content);
+        postData.append("image", image, title); //passing title name with image it will also be included in the name 
+        this.http.post<{message: string, postId: string}>('http://localhost:3000/api/posts', postData)
           .subscribe((responseData) => {
-              const id = responseData.postId;
-              post.id =id;
+              const post: Post = {
+                  id: responseData.postId,
+                   title: title, 
+                   content: content };
               this.posts.push(post);
               this.postsUpdated.next([...this.posts]);
               this.router.navigate(["/"]); // adding navigation to postList after adding post

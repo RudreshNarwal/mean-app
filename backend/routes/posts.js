@@ -1,13 +1,34 @@
 // organising routes for complex websites
 const express = require("express");
+const multer = require("multer");
 
 const Post = require("../models/post");
 
-
 const router = express.Router();
 
+const MIME_TYPE_MAP ={  //MIME TYPE supported in this 
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+}
 
-router.post("", (req, res, next) => {
+const storage = multer.diskStorage({ //To configure where multer should put file 
+  destination: (req, file, cb) => {
+    const isValid = MIME_TYPE_MAP(file.mimetype); 
+    let error = new Error("Invalid mime type"); // throughing error if we don't have specified mime type
+    if (isValid) {
+      error = null;
+    }
+    cb(error, "backend/images"); // cb is callback 
+  },
+  filename: (req, file, cb) => {
+    const name = file.originalname.toLowerCase().split('').join('-'); // anywhite space will be replaced with -
+    const ext = MIME_TYPE_MAP(file.mimetype);
+    cb(null, name + '-' + Date.now() + '.' + ext); // cb to pass info to multer 
+  }
+});
+
+router.post("", multer({storage: storage}).single("image"), (req, res, next) => {   // multer will now try to handle single post request 
     //const post = req.body; // body is body parser object
   const post = new Post({  // post object that is managed by mongoose 
     title: req.body.title,  // body is body parser object // holds parameters that are sent up from the client as part of a POST request.

@@ -77,12 +77,17 @@ export class PostCreateComponent implements OnInit{
     }
     this.isLoading = true; // we don't need to change it's value to false as we will navigate away from this page anyway and when we begin, it's initial value will be false
     if (this.mode == 'create') {
-      this.postsService.addPost(this.form.value.title, this.form.value.content);
+      this.postsService.addPost(
+        this.form.value.title,
+        this.form.value.content,
+        this.form.value.image
+        );
     } else {
       this.postsService.updatePost(
         this.postId,
         this.form.value.title,
         this.form.value.content
+
       );
     }
   //  this.form.resetForm();
