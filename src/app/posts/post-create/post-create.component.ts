@@ -28,32 +28,37 @@ export class PostCreateComponent implements OnInit{
       title: new FormControl(null, {
         validators: [Validators.required, Validators.minLength(3)]
       }),
-      content: new FormControl(null, {
-        validators: [Validators.required]
-      }),
+      content: new FormControl(null, { validators: [Validators.required] }),
       image: new FormControl(null, {
         validators: [Validators.required],
         asyncValidators: [mimeType]
-      }) 
+      })   
     }); //FormGroup constructor take JS object
+   
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
-      if(paramMap.has('postId')){
-        this.mode = 'edit';
-        this.postId = paramMap.get('postId');
-        this.isLoading = true; // initializing spinner
+      if (paramMap.has("postId")) {
+        this.mode = "edit";
+        this.postId = paramMap.get("postId");
+        this.isLoading = true;  // initializing spinner
         this.postsService.getPost(this.postId).subscribe(postData => {
-          this.isLoading = false; // terminating spinner 
-          this.post = {id: postData._id, title: postData.title, content: postData.content};
+          this.isLoading = false;   // terminating spinner
+          this.post = {
+            id: postData._id,
+            title: postData.title,
+            content: postData.content,
+            imagePath: postData.imagePath
+          };
+          this.form.setValue({     // this setvalue is used only in reactive form only
+            title: this.post.title,
+            content: this.post.content,
+            image: this.post.imagePath
+          });
         });
-        this.form.setValue({  // this setvalue is used only in reactive form only
-          title: this.post.title,
-          content: this.post.content
-        }); //here we are initializing our post in case we got a loaded post
-      } else {
-        this.mode = 'create';
+      } else {   //here we are initializing our post in case we got a loaded post
+        this.mode = "create";
         this.postId = null;
       }
-    }); // paramMap is an observable which we have subscribe as parameter in the url could change
+    });   // paramMap is an observable which we have subscribe as parameter in the url could change
     // with this we can listen to changes in routes 
   }
 
@@ -70,27 +75,25 @@ export class PostCreateComponent implements OnInit{
     // console.log(this.form);
   }
 
-
   onSavePost() {
     if (this.form.invalid) {
       return;
     }
-    this.isLoading = true; // we don't need to change it's value to false as we will navigate away from this page anyway and when we begin, it's initial value will be false
-    if (this.mode == 'create') {
+    this.isLoading = true;  // we don't need to change it's value to false as we will navigate away from this page anyway and when we begin, it's initial value will be false
+    if (this.mode === "create") {
       this.postsService.addPost(
         this.form.value.title,
         this.form.value.content,
         this.form.value.image
-        );
+      );
     } else {
       this.postsService.updatePost(
         this.postId,
         this.form.value.title,
-        this.form.value.content
-
+        this.form.value.content,
+        this.form.value.image
       );
     }
-  //  this.form.resetForm();
-  this.form.reset();
+    this.form.reset();
   }
 }

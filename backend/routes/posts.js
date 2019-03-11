@@ -1,6 +1,6 @@
 // organising routes for complex websites
 const express = require("express");
-const multer = require("multer");
+const multer = require("multer");  // multer allow us to extract incoming files
 
 const Post = require("../models/post");
 
@@ -14,41 +14,54 @@ const MIME_TYPE_MAP ={  //MIME TYPE supported in this
 
 const storage = multer.diskStorage({ //To configure where multer should put file 
   destination: (req, file, cb) => {
-    const isValid = MIME_TYPE_MAP(file.mimetype); 
+    const isValid = MIME_TYPE_MAP[file.mimetype]; 
     let error = new Error("Invalid mime type"); // throughing error if we don't have specified mime type
     if (isValid) {
       error = null;
     }
-    cb(error, "backend/images"); // cb is callback 
+    cb(error, "backend/images"); // cb is callback . here first argument is for any errors, all set to null here and second is a string, which
+                                   // is the path of folder where it should be stored 
   },
   filename: (req, file, cb) => {
     const name = file.originalname.toLowerCase().split('').join('-'); // anywhite space will be replaced with -
-    const ext = MIME_TYPE_MAP(file.mimetype);
+    const ext = MIME_TYPE_MAP[file.mimetype];
     cb(null, name + '-' + Date.now() + '.' + ext); // cb to pass info to multer 
   }
 });
 
 router.post("", multer({storage: storage}).single("image"), (req, res, next) => {   // multer will now try to handle single post request 
     //const post = req.body; // body is body parser object
-  const post = new Post({  // post object that is managed by mongoose 
+    const url = req.protocol + '://' + req.get("host");
+    const post = new Post({  // post object that is managed by mongoose 
     title: req.body.title,  // body is body parser object // holds parameters that are sent up from the client as part of a POST request.
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + "/images/" + req.file.filename  //accessing image through image path
   });
   post.save().then(createdPost => {  // save is provided by mongoose, then mongoose automatically write the data to database 
       res.status(201).json({
         message: "Post added successfully",
-        postId: createdPost._id
+        post: {
+          ...createdPost, // this will create all the property of created post 
+          id: createdPost._id
+        }
       }); //201 means everything is ok and a resource is added
   });   
 });
 
 // to put a new resource and to completely replace resource with the new one 
-router.put("/:id", (req, res, next) => {
+router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) => {
+  let imagePath = req.body.imagePath;
+  if (req.file){
+    const url = req.protocol + "://" + req.get("host");
+    imagePath = url + "/images/" + req.file.filename
+  }
   const post =new Post({
     _id: req.body.id,
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: req.body.imagePath
   });
+  console.log(post);
   Post.updateOne({_id: req.params.id}, post).then(result => {
     console.log(result);
     res.status(200).json({message: "Updated Successfully !"});
