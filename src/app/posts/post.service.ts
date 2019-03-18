@@ -12,29 +12,34 @@ import { Post } from './post.modal';
 export class PostService {
     // private as you can't edit it form outside
     private posts: Post[] = [];
-    private postsUpdated = new Subject<Post[]>(); // Passing list of post as payload 
+    private postsUpdated = new Subject<{posts: Post[], postCount: number}>(); // Passing list of post as payload 
 
     constructor(private http: HttpClient, private router: Router) {}
 
-    getPosts() {
+    getPosts(postsPerPage: number, currentPage: number) {
         // If we edit this spread operator array then our original array will reamin unmutable.
         // try to use unmutable array. It's good practise in programming
        // return [...this.posts];
-       this.http.get<{message: string, posts: any}>('http://localhost:3000/api/posts')
+       const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;  // bacticks allow us to add dynamic content in JS 
+       this.http.get<{message: string, posts: any, maxPosts: number}>('http://localhost:3000/api/posts' + queryParams)
          .pipe(map((postData) => {  //here we will use operator that is provided by observable. It simply convert _id from server to 
                                       //  id as we have used id in our front end. After this call simply is passed to Subscribe.  
-                    return postData.posts.map(post => {  // returning modified postData to .subscribe
+                    return {posts: postData.posts.map(post => {  // returning modified postData to .subscribe
                         return {
                             title: post.title,
                             content: post.content,
                             id: post._id,
                             imagePath: post.imagePath
                         };
-                    });
+                    }), 
+                    maxPosts: postData.maxPosts};
                  })) // above pipe data is passed to subscribe 
-         .subscribe((transformedPosts) => {
-             this.posts = transformedPosts;
-             this.postsUpdated.next([...this.posts]);
+         .subscribe((transformedPostsData) => {
+             this.posts = transformedPostsData.posts;
+             this.postsUpdated.next({
+                 posts: [...this.posts],
+                 postCount: transformedPostsData.maxPosts
+                });
          });
     }
 
@@ -56,14 +61,6 @@ export class PostService {
         postData.append("image", image, title); //passing title name with image it will also be included in the name 
         this.http.post<{message: string, post: Post}>('http://localhost:3000/api/posts', postData)
           .subscribe((responseData) => {
-              const post: Post = {
-                   id: responseData.post.id,
-                   title: title, 
-                   content: content,
-                   imagePath: responseData.post.imagePath
-                };
-              this.posts.push(post);
-              this.postsUpdated.next([...this.posts]);
               this.router.navigate(["/"]); // adding navigation to postList after adding post
           });  
     }
@@ -88,27 +85,14 @@ export class PostService {
         this.http.put('http://localhost:3000/api/posts/'+ id, postData)
                .subscribe(response => { 
                    // locally update post
-                   const updatedPosts = [...this.posts];
-                   const oldPostIndex = updatedPosts.findIndex(p => p.id === id);// adding post to that index
-                   const post: Post = {
-                    id: id,
-                    title: title,
-                    content: content,
-                    imagePath: "response.imagePath"
-                   };
-                   updatedPosts[oldPostIndex] = post;
-                   this.posts = updatedPosts;  
-                   this.postsUpdated.next([...this.posts]);  //updating post data
+                
+                //    this.postsUpdated.next([...this.posts]);  //updating post data
                    this.router.navigate(["/"]);  // adding navigation to postList after adding post
                 });
     }
 
     deletePost(postId: string){
-        this.http.delete('http://localhost:3000/api/posts/' + postId)
-          .subscribe(() => {
-              const updatedPosts = this.posts.filter(post => post.id !== postId);
-              this.posts = updatedPosts;
-              this.postsUpdated.next([...this.posts]);
-          });
+        return this.http.delete('http://localhost:3000/api/posts/' + postId)
+         
     }
 }

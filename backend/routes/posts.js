@@ -70,12 +70,27 @@ router.put("/:id", multer({storage: storage}).single("image"), (req, res, next) 
 
  // we can also use router.get() in below mentioned function
 router.get("", (req, res, next) => {
-  Post.find().then(documents => {   // find is mongoose function which find the documents with the specified selector
+  //console.log(req.query);  //For page and page size using query parameters
+  const pageSize = +req.query.pagesize;  //by default query parameters will return string
+  const currentPage = +req.query.page;
+  const postQuery = Post.find(); 
+  let fetchedPosts;
+  if (pageSize && currentPage) {
+    postQuery
+       .skip(pageSize * (currentPage - 1))
+       .limit(pageSize);  //limit the amounts of documents we return
+  }
+  postQuery.then(documents => {   // find is mongoose function which find the documents with the specified selector
+    fetchedPosts = documents;
+    return Post.count();
+  })
+  .then(count => {
     res.status(200).json({     //result of documents
       message: "Posts fetched successfully!",
-      posts: documents  //this documents is collection in our database
-    });
-  });
+      posts: fetchedPosts,  //this documents is collection in our database
+      maxPosts: count
+    }); 
+  })
 });
 
 router.get("/:id", (req, res, next) => {
