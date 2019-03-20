@@ -1,3 +1,8 @@
+main {
+  width: 80%;
+  margin: 1rem auto;
+}
+
 :host {
     display: block;
     margin-top: 1rem;
@@ -12,7 +17,7 @@ mat-spinner {
 }
 
 mat-paginator {
-    margin-top: 1rem; 
+    margin-top: 1rem;
 }
 
 .post-image{

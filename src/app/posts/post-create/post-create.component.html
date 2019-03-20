@@ -1,6 +1,7 @@
  <!--Property binding value-->
  <!-- For comments-->
- <mat-card>
+ <main>
+  <mat-card>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
   <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading">
     <mat-form-field>
@@ -21,3 +22,4 @@
     <button mat-raised-button color="accent" type="submit">Save Post</button>
   </form>
 </mat-card>
+</main>

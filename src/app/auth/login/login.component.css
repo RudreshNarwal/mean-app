@@ -24,8 +24,8 @@ main {
     padding: 0;
     background: url(../../../assets/1.jpg);
     background-size: cover;
-    transform: translate(-10%, -2.2%);
-    /* background-position: center; */
+    /* transform: translate(-10%, -2.2%); */
+    background-position: center;
     height: 95vh;
     width: 100vw;
 }
@@ -34,7 +34,8 @@ main {
   mat-card {
     width: 70vw;
   }
-  main {
-    transform: translate(-10%, -2.8%);
+  main{
+    background: url(../../../assets/paperBG.jpg);
+    background-size: cover;
   }
 }
