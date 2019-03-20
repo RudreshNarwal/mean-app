@@ -1,0 +1,40 @@
+mat-card {
+  width: 40vw;
+  position: relative;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+mat-form-field,
+textarea {
+    width: 100%;
+}
+
+mat-spinner {
+    margin: auto;
+}
+
+button {
+    margin-top: 20px;
+}
+
+main {
+    margin: 0;
+    padding: 0;
+    background: url(../../../assets/1.jpg);
+    background-size: cover;
+    transform: translate(-10%, -2.2%);
+    /* background-position: center; */
+    height: 95vh;
+    width: 100vw;
+}
+
+@media (max-width: 768px) {
+  mat-card {
+    width: 70vw;
+  }
+  main {
+    transform: translate(-10%, -2.8%);
+  }
+}

@@ -8,6 +8,10 @@ a {
     color: white;
 }
 
+ul {
+  display: flex;
+}
+
 .spacer {
-    flex: 1 1 auto; /* toolbar uses flexbox by default and this will make sure that sapcer element takes all th remaining space between other element*/ 
-}   
+    flex: 1 1 auto; /* toolbar uses flexbox by default and this will make sure that sapcer element takes all th remaining space between other element*/
+}
