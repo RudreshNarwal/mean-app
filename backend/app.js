@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*"); // Allow which domain are allow to access our resources
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"  // the incoming request may have these extra header
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"  // the incoming request may have these extra header
   );
   res.setHeader(
     "Access-Control-Allow-Methods",           // Here we control which http verb we will use
